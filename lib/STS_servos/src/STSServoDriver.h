@@ -27,6 +27,7 @@ namespace STSRegisters
     byte const MAXIMUM_VOLTAGE         = 0x0E;
     byte const MINIMUM_VOLTAGE         = 0x0F;
     byte const MAXIMUM_TORQUE          = 0x10;
+    byte const PHASE                   = 0x12;
     byte const UNLOADING_CONDITION     = 0x13;
     byte const LED_ALARM_CONDITION     = 0x14;
     byte const POS_PROPORTIONAL_GAIN   = 0x15;
@@ -199,6 +200,20 @@ class STSServoDriver
         /// \return Register value, 0 on failure.
         int16_t readTwoBytesRegister(byte const& servoId, byte const& registerId);
 
+        bool setMotionProfile(byte servoId, uint16_t position, uint16_t speed,
+                              byte acceleration);
+
+        /// \brief Read a sequence of consecutive registers.
+        /// \param[in] servoId ID of the servo
+        /// \param[in] startRegister First register
+        /// \param[in] readLength Number of registers to write
+        /// \param[out] outputBuffer Buffer where to read the data (must have been allocated by the user)
+        /// \return 0 on success, -1 if write failed, -2 if read failed, -3 if checksum verification failed
+        int readRegisters(byte const& servoId,
+                            byte const& startRegister,
+                            byte const& readLength,
+                            byte *outputBuffer);
+
     private:
 
     
@@ -249,17 +264,6 @@ class STSServoDriver
                             byte const& writeLength,
                             byte const *parameters,
                             bool const& asynchronous = false);
-
-        /// \brief Read a sequence of consecutive registers.
-        /// \param[in] servoId ID of the servo
-        /// \param[in] startRegister First register
-        /// \param[in] readLength Number of registers to write
-        /// \param[out] outputBuffer Buffer where to read the data (must have been allocated by the user)
-        /// \return 0 on success, -1 if write failed, -2 if read failed, -3 if checksum verification failed
-        int readRegisters(byte const& servoId,
-                            byte const& startRegister,
-                            byte const& readLength,
-                            byte *outputBuffer);
 
         HardwareSerial *port_;
         IMXRT_LPUART_t* s_pkuart_;

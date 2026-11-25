@@ -221,6 +221,25 @@ bool STSServoDriver::setTargetPosition(byte const& servoId, int const& position,
 }
 
 
+bool STSServoDriver::setMotionProfile(byte servoId, uint16_t position,
+                                      uint16_t speed, byte acceleration)
+{
+    const byte profile[] = {
+        acceleration, lowByte(position), highByte(position),
+        0, 0, lowByte(speed), highByte(speed)
+    };
+    if (!writeRegisters(servoId, STSRegisters::TARGET_ACCELERATION,
+                        sizeof(profile), profile))
+        return false;
+
+    byte applied[sizeof(profile)];
+    return readRegisters(servoId, STSRegisters::TARGET_ACCELERATION,
+                         sizeof(applied), applied) == 0 &&
+           memcmp(applied, profile, 3) == 0 &&
+           applied[5] == profile[5] && applied[6] == profile[6];
+}
+
+
 bool STSServoDriver::setTargetVelocity(byte const& servoId, int const& velocity, bool const& asynchronous)
 {
     return writeTwoBytesRegister(servoId, STSRegisters::RUNNING_SPEED, velocity, asynchronous);

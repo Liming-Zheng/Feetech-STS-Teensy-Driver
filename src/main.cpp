@@ -21,6 +21,7 @@
 #define SERVO_MAX_COMD 4096
 
 void sendData(uint8_t* data, size_t length);
+void pollUsbServo(STSServoDriver& servos);
 
 STSServoDriver servos;
 
@@ -74,9 +75,9 @@ digitalWrite(LED_BUILTIN, HIGH);
   digitalWrite(LED_BUILTIN, LOW);
   delay(1000);
   digitalWrite(LED_BUILTIN, HIGH);
-  Serial.begin(9600);
   Serial.println("Starting Teensy");
 #endif
+  Serial.begin(115200);
   SERIAL_COMMS.begin(SERIAL_COMMS_BAUDRATE);
 
   //initialize the motor pins
@@ -92,6 +93,7 @@ digitalWrite(LED_BUILTIN, HIGH);
 
 void loop()
 {
+  pollUsbServo(servos);
   if(SERIAL_COMMS.available() > 0)
   {
     //read the first 2 bytes in the serial buffer
